@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: spring-build-ci
+spec:
+  containers:
+    - name: maven
+      image: maven:alpine
+      command:
+        - cat
+      tty: true
+      volumeMounts:
+        - name: m2
+          mountPath: /root/.m2/
+    - name: docker-tools
+      image: rmkanda/docker-tools:latest
+      command:
+        - cat
+      tty: true
+      volumeMounts:
+        - mountPath: /var/run
+          name: docker-sock
+        - mountPath: /tmp/trivycache/
+          name: trivycache
+    - name: trufflehog
+      image: rmkanda/trufflehog
+      command:
+        - cat
+      tty: true
+    - name: licensefinder
+      image: licensefinder/license_finder
+      command:
+        - cat
+      tty: true
+  volumes:
+    - name: m2
+      hostPath:
+        path: /tmp/.m2/
+    - name: docker-sock
+      hostPath:
+        path: /var/run
+    - name: trivycache
+      hostPath:
+        path: /tmp/trivycache/
